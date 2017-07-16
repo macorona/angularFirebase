@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en-MX">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <title>Todo-App</title>
+</head>
+<body>
+
+  <div ng-app='todoApp' ng-controller='todoController as todoCtrl'>
+
+        <div class="add-task">
+          <label for="task-text">Task:</label>
+          <input type="text" ng-model="taskText" id="task-text">
+          <button ng-click="addTask(taskText)">Añadir Tarea</button>
+        </div>
+
+        <div class="todo-list">
+          <ul>
+            <li ng-repeat="task in tasks">
+                <input type="checkbox" ng-model="task.done" ng-change="tasks.$save(task)">
+                {{task.text}}
+                &nbsp;<i class="fa fa-trash" aria-hidden="true" ng-click="removeTask($index)"></i>
+
+            </li>
+          </ul>
+        </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.8.0/firebase.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angularFire/2.3.0/angularfire.js"></script>
+    <script>
+      (function() {
+        var todoApp = angular.module('todoApp',['firebase']);
+
+        todoApp.config(function() {
+          var config = {
+              apiKey: "AIzaSyB5BcjQodbQrnxw9b4Q2piWwQ4SgbIeeQY",
+              authDomain: "angularfirebase-2cf5e.firebaseapp.com",
+              databaseURL: "https://angularfirebase-2cf5e.firebaseio.com"
+          };
+          firebase.initializeApp(config);
+
+        });
+
+        todoApp.controller('todoController',['$scope', '$firebaseArray', function($scope, $firebaseArray) {
+
+            var taskRef = firebase.database().ref('tasks');
+            var tasks = $firebaseArray(taskRef);
+            $scope.tasks = tasks;
+
+            $scope.debugClick = function(task) {
+              console.info(task);
+            }
+
+            $scope.addTask = function(text) {
+              //$scope.tasks.push({text:text, done:false});
+              $scope.tasks.$add({text: text, done:false});
+              console.log(text);
+              $scope.taskText = "";
+            }
+            $scope.removeTask = function(index) {
+              console.log("indice eliminado: " + index);
+              //$scope.tasks.splice(index,1);
+              $scope.tasks.$remove(index);
+            }
+
+
+        }]);
+
+      })();
+
+    </script>
+
+</body>
+</html>
